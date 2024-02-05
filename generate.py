@@ -1,31 +1,24 @@
 import pyrosim.pyrosim as pyrosim
 
-pyrosim.Start_SDF("box.sdf")
+def Create_World():
+    pyrosim.Start_SDF("world.sdf")
+    pyrosim.Send_Cube(name="Box", pos=[5, 5, .5], size=[1, 1, 1])
+    pyrosim.End()
 
-# Initial dimensions
-initial_length = 1
-initial_width = 1
-initial_height = 1
+def Create_Robot():
+    pyrosim.Start_URDF("body.urdf")
+    pyrosim.Send_Cube(name="Link0", pos=[0, 0, 1.5], size=[1, 1, 1])
+    ## Joints should not be in the same spot possibly, since links are not in same spot
+    ## Reconsider the posiitoning of the joints and adjust links as needed
+    pyrosim.Send_Joint( name = "Link0_Link1" , parent= "Link0" , child = "Link1" , type = "revolute", position = [-.5, 0, 1])
+    pyrosim.Send_Joint( name = "Link0_Link2" , parent= "Link0" , child = "Link2" , type = "revolute", position = [.5, 0, 1])
 
-for j in range(5):  # Rows in the grid
-    for k in range(5):  # Columns in the grid
-        # Reset the base position for each tower
-        x = j * initial_width  # No need to recalculate these each loop
-        y = k * initial_length
-        z = 0.5
+    ## x, y, z. X runs across the screen, y runs "into" the screen and z runs up and down. Links are spaced on y axis, adjust x to adjust joints on face of link0
+    ## Adjust y to adjust joint "depth" in link0, different from z to adjust joint height. Height is the only one I'm fairly certain is correct 
+    pyrosim.Send_Cube(name ="Link1",pos=[-.5, 0, -.5], size=[1, 1, 1] )
+    pyrosim.Send_Cube(name ="Link2",pos=[.5, 0, -.5], size=[1, 1, 1] )
+     
+    pyrosim.End()
 
-        # Reset dimensions for each tower
-        loopLength = initial_length
-        loopWidth = initial_width
-        loopHeight = initial_height
-
-        for i in range(10):  # Blocks in each tower
-            name = f"Box_{j}_{k}_{i}"  # Unique name for each cube
-            pyrosim.Send_Cube(name=name, pos=[x, y, z], size=[loopLength, loopWidth, loopHeight])
-            z += loopHeight  # Move up for the next block
-            # Decrease dimensions for the next block within the same tower
-            loopLength *= 0.9
-            loopWidth *= 0.9
-            loopHeight *= 0.9
-
-pyrosim.End()
+Create_World()
+Create_Robot()
