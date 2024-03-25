@@ -1,7 +1,6 @@
 import math
 
 import pybullet
-
 import pyrosim.pyrosim as pyrosim
 
 import pyrosim.constants as c
@@ -19,6 +18,38 @@ class NEURON:
         self.Search_For_Joint_Name(line)
 
         self.Set_Value(0.0)
+
+    def Update_Sensor_Neuron(self):
+        self.Set_Value(pyrosim.Get_Touch_Sensor_Value_For_Link(self.Get_Link_Name()))
+
+    def Update_Hidden_Or_Motor_Neuron(self, synapses, neurons):
+        self.Set_Value(0)
+        for synapseKey in synapses.keys():
+            if synapseKey[1] == self.Get_Name():
+                # Extract the weight of the synapse
+                synapse = synapses[synapseKey]
+                synapse_weight = synapse.Get_Weight()
+                
+                # Extract the name and value of the presynaptic neuron
+                presynaptic_neuron_name = synapseKey[0]
+                presynaptic_neuron = neurons[presynaptic_neuron_name]
+                presynaptic_value = presynaptic_neuron.Get_Value()
+                
+                # Update the current neuron's value based on the presynaptic influence
+                self.Allow_Presynaptic_Neuron_To_Influence_Me(synapse_weight, presynaptic_value)
+        self.Threshold()
+
+
+
+
+    def Allow_Presynaptic_Neuron_To_Influence_Me(self, weight, presynaptic_value):
+        # Multiply the presynaptic neuron's value by the synapse's weight
+        influence = presynaptic_value * weight
+        
+        # Add this result to the postsynaptic neuron's value
+        self.Add_To_Value(influence)
+
+
 
     def Add_To_Value( self, value ):
 

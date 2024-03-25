@@ -31,16 +31,23 @@ class ROBOT:
                         self.motors[jointName] = MOTOR(jointName, self.robotId)
 
         def Act(self):
-            for neuronName in self.nn.neurons:  # Directly iterate over neuron names
+            
+            for neuronName in self.nn.Get_Neuron_Names():
+                #print("neuron name: ", neuronName)
+                
                 if self.nn.Is_Motor_Neuron(neuronName):
-                    jointName = self.nn.Get_Motor_Neurons_Joint(neuronName)
-                    #print(jointName)
+                
+                    self.jointName = self.nn.Get_Motor_Neurons_Joint(neuronName)
+                    print("joint is:", self.jointName)
                     desiredAngle = self.nn.Get_Value_Of(neuronName)
-                    # Now, directly use the desiredAngle for the specific motor
-                    #print(self.motors)
-                    for motor in self.motors.values():
-                        motor.Set_Value(desiredAngle)
-
+                    print("d angle:", desiredAngle)
+                    #print("self motors", self.motors[self.jointName])
+                    self.motors[bytes(self.jointName, 'ASCII')].Set_Value(desiredAngle, self.robotId)
+                    # if self.jointName in self.motors:
+                    #     #error in act, this if is not triggering
+                    #     #set value is not being called here
+                    #     print("self.motors: ", self.motors)
+                    # self.motors[jointName].Set_Value(desiredAngle, self.robotId)
                     
             
         def Think(self):
