@@ -25,7 +25,7 @@ class SIMULATION:
                     
 
                 
-                    time.sleep(1/30)
+                    time.sleep(1/40)
 
         def __del__(self):
               p.disconnect()

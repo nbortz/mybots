@@ -1,4 +1,5 @@
 import pyrosim.pyrosim as pyrosim
+import random
 
 def Create_World():
     pyrosim.Start_SDF("world.sdf")
@@ -21,23 +22,23 @@ def Generate_Body():
 
 def Generate_Brain():
     pyrosim.Start_NeuralNetwork("brain.nndf")
-    pyrosim.Send_Sensor_Neuron(name = 0 , linkName = "Torso")
-    pyrosim.Send_Sensor_Neuron(name = 1 , linkName = "BackLeg")
-    pyrosim.Send_Sensor_Neuron(name = 2 , linkName = "FrontLeg")
+    # Sensor Neurons
+    sensor_neurons = [0, 1, 2]  # Neurons for Torso, BackLeg, and FrontLeg
+    for i, linkName in enumerate(["Torso", "BackLeg", "FrontLeg"]):
+        pyrosim.Send_Sensor_Neuron(name=sensor_neurons[i], linkName=linkName)
 
-    pyrosim.Send_Motor_Neuron( name = 3 , jointName = "Torso_BackLeg")
-    pyrosim.Send_Motor_Neuron( name = 4 , jointName = "Torso_FrontLeg")
+    # Motor Neurons
+    motor_neurons = [3, 4]  # Neurons for Torso_BackLeg and Torso_FrontLeg joints
+    for i, jointName in enumerate(["Torso_BackLeg", "Torso_FrontLeg"]):
+        pyrosim.Send_Motor_Neuron(name=motor_neurons[i], jointName=jointName)
 
-    pyrosim.Send_Synapse( sourceNeuronName = 0 , targetNeuronName = 3 , weight = 1 )
-    pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight =1 )
-    pyrosim.Send_Synapse( sourceNeuronName = 0 , targetNeuronName = 3 , weight = .5 )
-    pyrosim.Send_Synapse( sourceNeuronName = 1 , targetNeuronName = 3 , weight =.5 )
-
-    
-
+    # Fully connected network - Connect each sensor neuron to each motor neuron
+    for sensor_neuron in sensor_neurons:
+        for motor_neuron in motor_neurons:
+            weight = (random.random() * 2) -1
+            pyrosim.Send_Synapse(sourceNeuronName=sensor_neuron, targetNeuronName=motor_neuron, weight= weight)
 
     pyrosim.End()
-
 
     
 
